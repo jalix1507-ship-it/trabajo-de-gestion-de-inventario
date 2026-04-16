@@ -1,1 +1,200 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
+namespace InventarioApp
+{
+    class Producto
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public int Cantidad { get; set; }
+        public double Precio { get; set; }
+
+        public Producto(int id, string nombre, int cantidad, double precio)
+        {
+            Id = id;
+            Nombre = nombre;
+            Cantidad = cantidad;
+            Precio = precio;
+        }
+
+        public void Mostrar()
+        {
+            Console.WriteLine($"ID: {Id} | Nombre: {Nombre} | Cantidad: {Cantidad} | Precio: {Precio:C}");
+        }
+    }
+
+    class Inventario
+    {
+        private List<Producto> productos = new List<Producto>();
+
+        private int LeerEntero(string mensaje)
+        {
+            int valor;
+            while (true)
+            {
+                Console.Write(mensaje);
+                if (int.TryParse(Console.ReadLine(), out valor))
+                    return valor;
+
+                Console.WriteLine("Entrada invalida. Intente de nuevo.");
+            }
+        }
+
+        private double LeerDouble(string mensaje)
+        {
+            double valor;
+            while (true)
+            {
+                Console.Write(mensaje);
+                if (double.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out valor))
+                    return valor;
+
+                Console.WriteLine("Entrada invalida. Intente de nuevo.");
+            }
+        }
+
+        public void AgregarProducto()
+        {
+            Console.WriteLine("\n--- AGREGAR PRODUCTO ---");
+
+            int id = LeerEntero("Ingrese ID: ");
+
+            if (productos.Exists(p => p.Id == id))
+            {
+                Console.WriteLine("Ya existe un producto con ese ID.");
+                return;
+            }
+
+            Console.Write("Ingrese Nombre: ");
+            string nombre = Console.ReadLine();
+
+            int cantidad = LeerEntero("Ingrese Cantidad: ");
+            double precio = LeerDouble("Ingrese Precio: ");
+
+            productos.Add(new Producto(id, nombre, cantidad, precio));
+            Console.WriteLine("Producto agregado correctamente.");
+        }
+
+        public void MostrarProductos()
+        {
+            Console.WriteLine("\n--- INVENTARIO ---");
+
+            if (productos.Count == 0)
+            {
+                Console.WriteLine("No hay productos.");
+                return;
+            }
+
+            foreach (var p in productos)
+            {
+                p.Mostrar();
+            }
+        }
+
+        public void BuscarProducto()
+        {
+            Console.WriteLine("\n--- BUSCAR PRODUCTO ---");
+
+            int id = LeerEntero("Ingrese ID a buscar: ");
+            var producto = productos.Find(p => p.Id == id);
+
+            if (producto != null)
+                producto.Mostrar();
+            else
+                Console.WriteLine("Producto no encontrado.");
+        }
+
+        public void EliminarProducto()
+        {
+            Console.WriteLine("\n--- ELIMINAR PRODUCTO ---");
+
+            int id = LeerEntero("Ingrese ID a eliminar: ");
+            var producto = productos.Find(p => p.Id == id);
+
+            if (producto != null)
+            {
+                productos.Remove(producto);
+                Console.WriteLine("Producto eliminado.");
+            }
+            else
+                Console.WriteLine("Producto no encontrado.");
+        }
+
+        public void ActualizarProducto()
+        {
+            Console.WriteLine("\n--- ACTUALIZAR PRODUCTO ---");
+
+            int id = LeerEntero("Ingrese ID a actualizar: ");
+            var producto = productos.Find(p => p.Id == id);
+
+            if (producto != null)
+            {
+                Console.Write("Nuevo nombre: ");
+                producto.Nombre = Console.ReadLine();
+
+                producto.Cantidad = LeerEntero("Nueva cantidad: ");
+                producto.Precio = LeerDouble("Nuevo precio: ");
+
+                Console.WriteLine("Producto actualizado.");
+            }
+            else
+                Console.WriteLine("Producto no encontrado.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Inventario inventario = new Inventario();
+            int opcion;
+
+            do
+            {
+                Console.WriteLine("\n=== SISTEMA DE INVENTARIO ===");
+                Console.WriteLine("1. Agregar Producto");
+                Console.WriteLine("2. Mostrar Productos");
+                Console.WriteLine("3. Buscar Producto");
+                Console.WriteLine("4. Actualizar Producto");
+                Console.WriteLine("5. Eliminar Producto");
+                Console.WriteLine("0. Salir");
+
+                Console.Write("Seleccione una opcion: ");
+
+                if (!int.TryParse(Console.ReadLine(), out opcion))
+                {
+                    Console.WriteLine("Opcion invalida.");
+                    continue;
+                }
+
+                switch (opcion)
+                {
+                    case 1:
+                        inventario.AgregarProducto();
+                        break;
+                    case 2:
+                        inventario.MostrarProductos();
+                        break;
+                    case 3:
+                        inventario.BuscarProducto();
+                        break;
+                    case 4:
+                        inventario.ActualizarProducto();
+                        break;
+                    case 5:
+                        inventario.EliminarProducto();
+                        break;
+                    case 0:
+                        Console.WriteLine("Saliendo...");
+                        break;
+                    default:
+                        Console.WriteLine("Opcion incorrecta.");
+                        break;
+                }
+
+            } while (opcion != 0);
+        }
+    }
+}
